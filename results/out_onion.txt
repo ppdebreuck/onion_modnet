@@ -1,0 +1,57 @@
+mae ph1 - f1: 0.530
+mae ph2 - f1: 0.689
+mae ph3 - f1: 0.490
+mae ph4 - f1: 0.483
+mae ph5 - f1: 0.502
+mae ph1 - f2: 0.437
+mae ph2 - f2: 0.430
+mae ph3 - f2: 0.415
+mae ph4 - f2: 0.401
+mae ph5 - f2: 0.398
+2-fold Summary
+mae ph1 : 0.483
+mae ph2 : 0.559
+mae ph3 : 0.452
+mae ph4 : 0.442
+mae ph5 : 0.450
+
+second run
+
+mae ph1 - f1: 0.501
+mae ph2 - f1: 0.489
+mae ph3 - f1: 0.478
+mae ph4 - f1: 0.459
+mae ph5 - f1: 0.451
+mae ph1 - f2: 0.456
+mae ph2 - f2: 0.468
+mae ph3 - f2: 0.431
+mae ph4 - f2: 0.401
+mae ph5 - f2: 0.388
+2-fold Summary
+mae ph1 : 0.478
+mae ph2 : 0.479
+mae ph3 : 0.454
+mae ph4 : 0.430
+mae ph5 : 0.420
+
+RUN With Xiaotong's 2-fold
+
+mae ph1 - f1: 0.555
+mae ph2 - f1: 0.555
+mae ph3 - f1: 0.529
+mae ph4 - f1: 0.549
+mae ph5 - f1: 0.526
+mae ph1 - f2: 0.483
+mae ph2 - f2: 0.468
+mae ph3 - f2: 0.447
+mae ph4 - f2: 0.439
+mae ph5 - f2: 0.459
+2-fold Summary
+mae ph1 : 0.519
+mae ph2 : 0.511
+mae ph3 : 0.488
+mae ph4 : 0.494
+mae ph5 : 0.492
+
+Second run
+

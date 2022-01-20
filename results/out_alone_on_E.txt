@@ -1,0 +1,15 @@
+mae exp - f1: 0.189
+mae exp - f2: 0.405
+mae exp 2-fold: 0.297
+mae gllb - f1: 3.889
+mae gllb - f2: 3.659
+mae gllb 2-fold: 3.774
+mae pbe - f1: 0.627
+mae pbe - f2: 0.720
+mae pbe 2-fold: 0.674
+mae scan - f1: 3.174
+mae scan - f2: 2.108
+mae scan 2-fold: 2.641
+mae hse - f1: 1.670
+mae hse - f2: 1.415
+mae hse 2-fold: 1.543

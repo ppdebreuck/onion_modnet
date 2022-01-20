@@ -1,0 +1,21 @@
+# STEP1: optimal params computed on exp
+# STEP2: fit and test on a specific functional only
+mae exp - f1: 0.408
+mae exp - f2: 0.429
+mae exp 2-fold: 0.419
+
+mae gllb - f1: 0.710
+mae gllb - f2: 0.720
+mae gllb 2-fold: 0.715
+
+mae pbe - f1: 0.378
+mae pbe - f2: 0.420
+mae pbe 2-fold: 0.399
+
+mae scan - f1: 0.701
+mae scan - f2: 0.686
+mae scan 2-fold: 0.694
+
+mae hse - f1: 0.522
+mae hse - f2: 0.535
+mae hse 2-fold: 0.528
