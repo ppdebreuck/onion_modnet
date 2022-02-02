@@ -28,14 +28,14 @@ def train_phase(model, train, test, ph_int, f_int, **fit_params):
 
     model.fit(train, callbacks=callbacks, **fit_params)
 
-    model.save("out/MODNet_onion_{}_ph{}".format(f_int, ph_int))
+    model.save("out/MODNet_onion_cleaning_{}_ph{}".format(f_int, ph_int))
 
     pred = model.predict(test)
     true = test.df_targets
     error = pred - true
     mae = np.abs(error.values).mean()
 
-    with open("results/out_onion.txt", "a") as fp:
+    with open("results/out_onion_cleaning.txt", "a") as fp:
         fp.write("mae ph{} - f{}: {:.3f}\n".format(ph_int, f_int + 1, mae))
     return mae
 
@@ -67,6 +67,11 @@ def main():
     maes_ph5 = np.ones(k)
     all_preds = []
     for i, f in enumerate(folds):
+
+        model_denoiser = MODNetModel.load(
+            "out/MODNet_alone_{}_exp".format(i + 1)
+        )  # model denoiser
+
         train = f[0]
         test = f[1]
         fpath = "train_folds/train_{}_{}".format(random_state, i + 1)
@@ -106,22 +111,24 @@ def main():
         )
 
         # phase 1
-        md = MD_append(train, [md_pbe, md_hse, md_gllb, md_scan])
+        md = MD_append_and_set(
+            train, [md_pbe, md_hse, md_gllb, md_scan], model_denoiser
+        )
         mae = train_phase(model, md, test, 1, i, **fit_params)
         maes_ph1[i] = mae
 
         # phase 2
-        md = MD_append(train, [md_pbe, md_hse, md_scan])
+        md = MD_append_and_set(train, [md_pbe, md_hse, md_scan], model_denoiser)
         mae = train_phase(model, md, test, 2, i, **fit_params)
         maes_ph2[i] = mae
 
         # phase 3
-        md = MD_append(train, [md_hse, md_scan])
+        md = MD_append_and_set(train, [md_hse, md_scan], model_denoiser)
         mae = train_phase(model, md, test, 3, i, **fit_params)
         maes_ph3[i] = mae
 
         # phase 4
-        md = MD_append(train, [md_hse])
+        md = MD_append_and_set(train, [md_hse], model_denoiser)
         mae = train_phase(model, md, test, 4, i, **fit_params)
         maes_ph4[i] = mae
 
@@ -134,7 +141,7 @@ def main():
         true.columns = ["true_gap"]
         all_preds.append(preds.join(true))
 
-    with open("results/out_onion.txt", "a") as fp:
+    with open("results/out_onion_cleaning.txt", "a") as fp:
         fp.write("2-fold Summary\n")
         fp.write("mae ph1 : {:.3f}\n".format(maes_ph1.mean()))
         fp.write("mae ph2 : {:.3f}\n".format(maes_ph2.mean()))
@@ -142,7 +149,7 @@ def main():
         fp.write("mae ph4 : {:.3f}\n".format(maes_ph4.mean()))
         fp.write("mae ph5 : {:.3f}\n".format(maes_ph5.mean()))
 
-    (pd.concat(all_preds)).to_csv("results/modnet_onion.csv")
+    (pd.concat(all_preds)).to_csv("results/modnet_onion_cleaning.csv")
 
 
 if __name__ == "__main__":

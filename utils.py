@@ -16,10 +16,9 @@ def shuffle_MD(data, random_state=10):
 
     return data
 
+def MDKsplit(data, n_splits=5, exp_split=True, random_state=10):
 
-def MDKsplit(data, n_splits=5, random_state=10):
-
-    if n_splits == 2:  # hardcoded split
+    if exp_split:  # hardcoded split
         f1, f2 = pd.read_pickle("data/fold-ids.pkl")
         fold_ids = [(f1, f2), (f2, f1)]
         folds = []
@@ -82,6 +81,19 @@ def MD_append(md, lmd):
     md = shuffle_MD(md)
     return md
 
+def MD_append_and_set(md, lmd, model_denoiser):
+    md = copy.deepcopy(md)
+    for m in lmd:
+        orig_len = len(md.df_structure)
+        md.df_structure = md.df_structure.append(m.df_structure)
+        md.df_featurized = md.df_featurized.append(m.df_featurized)
+        md.df_targets = md.df_targets.append(m.df_targets)
+        pred = model_denoiser.predict(md)
+        for idx, p in enumerate(pred['gap']):
+            if idx>orig_len and abs(p - md.df_targets['gap'][idx]) > 0.3:
+                md.df_targets['gap'][idx] = p
+    md = shuffle_MD(md)
+    return md
 
 def get_params(data, n_jobs=4):
     ga = FitGenetic(data)

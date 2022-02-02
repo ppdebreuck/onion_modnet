@@ -11,7 +11,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 k = 2
 random_state = 202010
-n_jobs = 64
+n_jobs = 32
 
 
 def main():
@@ -62,57 +62,62 @@ def main():
         [md_exp, md_gllb, md_pbe, md_scan, md_hse],
         ["exp", "gllb", "pbe", "scan", "hse"],
     ):
-        folds = MDKsplit(data, n_splits=k, random_state=random_state)
         maes = np.ones(k)
         print(f"Start with {name}...")
-        for i, f in enumerate(folds):
-            train = f[0]
-            train.optimal_features = optimal_feats[i]
-            test = f[1]
 
-            es = EarlyStopping(
-                monitor="loss",
-                min_delta=0.001,
-                patience=30,
-                verbose=0,
-                mode="auto",
-                baseline=None,
-                restore_best_weights=False,
-            )
-            callbacks = [es]
+        data.optimal_features = optimal_feats[i]
 
-            model = MODNetModel(
-                targets=params[i]["targets"],
-                weights=params[i]["weights"],
-                n_feat=params[i]["n_feat"],
-                num_neurons=params[i]["num_neurons"],
-                act=params[i]["act"],
-                num_classes={"gap": 0},
-            )
+        es = EarlyStopping(
+            monitor="loss",
+            min_delta=0.001,
+            patience=30,
+            verbose=0,
+            mode="auto",
+            baseline=None,
+            restore_best_weights=False,
+        )
+        callbacks = [es]
 
-            model.fit(
-                train,
-                loss=params[i]["loss"],
-                lr=params[i]["lr"],
-                epochs=params[i]["epochs"],
-                batch_size=params[i]["batch_size"],
-                xscale=params[i]["xscale"],
-                callbacks=callbacks,
-                verbose=0,
-            )
+        model = MODNetModel(
+            targets=params[i]["targets"],
+            weights=params[i]["weights"],
+            n_feat=params[i]["n_feat"],
+            num_neurons=params[i]["num_neurons"],
+            act=params[i]["act"],
+            num_classes={"gap": 0},
+        )
 
-            model.save("out/MODNet_alone_{}_{}".format(i + 1, name))
+        model.fit(
+            data,
+            loss=params[i]["loss"],
+            lr=params[i]["lr"],
+            epochs=params[i]["epochs"],
+            batch_size=params[i]["batch_size"],
+            xscale=params[i]["xscale"],
+            callbacks=callbacks,
+            verbose=0,
+        )
 
-            pred = model.predict(test)
+        model.save("out/MODNet_alone_{}_{}".format(i + 1, name))
+
+        all_preds = []
+        for i, test in enumerate(folds_exp):
+            preds = model.predict(test)
             true = test.df_targets
-            error = pred - true
+            true.columns = ["true_gap"]
+            error = preds - true
             mae = np.abs(error.values).mean()
+
+            all_preds.append(preds.join(true))
+
             with open("results/out_alone.txt", "a") as fp:
                 fp.write("mae {} - f{}: {:.3f}\n".format(name, i + 1, mae))
             maes[i] = mae
 
         with open("results/out_alone.txt", "a") as fp:
             fp.write("mae {} {}-fold: {:.3f}\n".format(name, k, maes.mean()))
+
+        (pd.concat(all_preds)).to_csv("results/{}_only.csv".format(name))
 
 
 if __name__ == "__main__":
